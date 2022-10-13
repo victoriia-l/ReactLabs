@@ -1,10 +1,14 @@
-import logo from './logo.svg';
 import './App.css';
 import { PhotosTable } from './components/photosTable';
+import Container from '@mui/material/Container';
 
 function App() {
   return (
-    PhotosTable()
+    <div className='App'>
+      <Container fixed>
+        {PhotosTable()}
+      </Container>
+    </div>
   );
 }
 

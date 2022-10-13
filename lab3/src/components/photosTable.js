@@ -1,44 +1,40 @@
 import { useState, useEffect } from "react";
 import Stack from '@mui/material/Stack';
 import { Image } from "./photo";
+import { FixedSizeList as List } from 'react-window';
 
 export function PhotosTable() {
     const [data, setData] = useState([]);
-
-    const getData = () => {
-        fetch('photos.json',
-        {
-            headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            }
-        })
-        .then(function(response) {
-            console.log(response)
-            return response.json();
-        })
-        .then(function(myJson) {
-            console.log(myJson);
-            setData(myJson)
-        });
-    }
-    useEffect(() => {
-        getData()
-    }, [])
     
-    const dataToDisplay = data.filter(item => item.title.split(' ').length <= 7)
-    console.log(dataToDisplay)
+    useEffect(() => {
+        fetch('photos.json')
+            .then((response) => response.json())
+            .then((responseJson) => setData(responseJson.filter(item => item.title.split(' ').length <= 7)))
+            .catch((error) => {
+                console.error(error);
+            });
+    }, ['photos.json'])
+
+
+    const Row = ({ index, style }) => (
+                <Stack direction="row" spacing={10} style={style}>
+                    <div>{data[index].id}</div>
+                    <div>{data[index].title}</div>
+                    <div>{Image(data[index].id, data[index].url, data[index].thumbnailUrl)}</div>
+                </Stack>
+      );
 
     return (
-        <div>{dataToDisplay && dataToDisplay.length>0 && dataToDisplay.map((item, id) => {
-            return (
-                <Stack direction="row" spacing={10} key={id}>
-                    <div>{id}</div>
-                    <div>{item.title}</div>
-                    <div>{Image(id, item.url, item.thumbnailUrl)}</div>
-                
-                </Stack>
-            )
-        })}</div>
+        <div>    
+            <List
+                height={500}
+                itemCount={data.length}
+                itemSize={35}
+                width='100%'>            
+            
+                {Row}
+            
+            </List>
+        </div>
     )
 }
